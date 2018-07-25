@@ -1,0 +1,4 @@
+pandas
+oauth2client
+apiclient
+httplib2
