@@ -37,6 +37,8 @@ df = goog.read_sheet(sheet_id='1kXKWc9p_ZE',
 goog.to_sheet(df, sheet_id='1kXKWc9p_ZE', tab='Sheet2')
 ```
 
+More details are available in this [Jupyter Notebook](http://nbviewer.jupyter.org/github/yinleon/googlespreadsheets/blob/master/examples/quickstart.ipynb?flush_cache=true)
+
 ## Documentation
 TBD
 
