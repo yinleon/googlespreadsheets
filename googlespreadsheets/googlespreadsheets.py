@@ -52,7 +52,7 @@ class GoogleSheets():
                             'version={}'.format(api_version))
         
         self._CLIENT_SECRET_FILE = _verify_credential(client_secret)
-        self._AUTHENTICATED_CRED = _verify_credential(access_token)
+        self._AUTHENTICATED_CRED = access_token
         self.credentials = self.get_credentials()
 
     
@@ -116,8 +116,10 @@ class GoogleSheets():
         return [sheet.get("properties", {}).get("title", "Sheet1") for sheet in sheets]
 
 
-    def read_sheet(self, sheet_id, tab, cell_range, dtype=None, 
-                   index=None, dateTimeRenderOption=None, fillna=None):
+    def read_sheet(self, sheet_id, cell_range, 
+                   tab='Sheet1', dtype=None, 
+                   index=None, dateTimeRenderOption=None, 
+                   fillna=None):
         '''
         Gets a sheet to a pandas dataframe given 
         a sheet_id (string) of a google sheet, 
@@ -133,7 +135,7 @@ class GoogleSheets():
 
         with
 
-        sheet_2_df(
+        read_sheet(
             id=1BxiMVs0XRA5nFMdKvBdBZjgmUUqptlbs74OgvE2upms,
             sheet='Class Data',
             range='A1:F'
@@ -187,12 +189,14 @@ class GoogleSheets():
             )
         return df
 
-    def to_sheet(self, df, sheet_id, tab, cell_range, valueInputOption='RAW'):
+    def to_sheet(self, df, cell_range, sheet_id=None, 
+                 tab='Sheet1', title='My New Sheet',
+                 valueInputOption='RAW'):
         '''
         Updates a sheet of a sheetid with 'values' (list of list)
         '''
 
-        values = df.values.tolist()    
+        values = [df.columns.tolist()] + df.values.tolist()   
 
         credentials = self.credentials
         http = credentials.authorize(httplib2.Http())
@@ -204,8 +208,19 @@ class GoogleSheets():
             http=http,
             discoveryServiceUrl=self._DISCOVERYURL
         )
-
-        # Construct arguments
+        
+        
+        if not sheet_id:
+            # create a new sheet
+            data = {'properties': {'title': title}}
+            
+            result_ = service.spreadsheets().create(
+                body= data
+            ).execute()
+            sheet_id = result_['spreadsheetId']
+            
+                # Construct arguments
+                
         rangeName = '{SHEET}!{RANGE}'.format(SHEET=tab,RANGE=cell_range)
 
         valueRange = {
@@ -213,13 +228,13 @@ class GoogleSheets():
             "majorDimension": "ROWS",
             "values": values
         }
-
+         
         result = service.spreadsheets().values().update(
             spreadsheetId=sheet_id,
-            range = rangeName,
+            range=rangeName,
             valueInputOption=valueInputOption,
-            body= valueRange      
+            body=valueRange      
         ).execute()
-
+        
         return result
     
