@@ -5,7 +5,7 @@ It allows users to easily read and write sheets to and from [Pandas](http://pand
 This is made public and hosted on PyPi for selfish reasons.
 
 ## Installation
-`pip install googlespreadshets`
+`pip install googlespreadsheets`
 
 ## API Credentials
 The Google Sheets API uses [OAuth2](https://developers.google.com/identity/protocols/OAuth2)
